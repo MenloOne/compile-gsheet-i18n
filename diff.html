@@ -1,0 +1,576 @@
+<htmls>
+    <head>
+        <style>
+            body {
+                font-size:8pt;
+            }
+            
+            #prettydiff #report.contentarea {
+                font-family: "Lucida Sans Unicode", "Helvetica", "Arial", sans-serif;
+                max-width: none;
+                overflow: scroll
+            }
+
+            /*report - borders*/
+            #prettydiff .diff .replace em,
+            #prettydiff .diff .delete em,
+            #prettydiff .diff .insert em {
+                border-style: solid;
+                border-width: 0.1em
+            }
+
+            /*report - text containers*/
+            #prettydiff #report dd,
+            #prettydiff #report dt,
+            #prettydiff #report p,
+            #prettydiff #report li,
+            #prettydiff #report td,
+            #prettydiff #report blockquote,
+            #prettydiff #report th {
+                font-family: "Lucida Sans Unicode", "Helvetica", "Arial", sans-serif;
+                font-size: 1.2em
+            }
+
+            /*report - jsscope output*/
+            #prettydiff div#webtool {
+                background: transparent;
+                font-size: inherit;
+                margin: 0;
+                padding: 0
+            }
+
+            /*report - error messaging in jspretty's report output*/
+            #prettydiff #jserror span {
+                display: block
+            }
+
+            /*report - markuppretty's accessibility report*/
+            #prettydiff #a11y {
+                background: transparent;
+                clear: both;
+                padding: 0
+            }
+
+            #prettydiff #a11y div {
+                margin: 0.5em 0;
+                border-style: solid;
+                border-width: 0.1em
+            }
+
+            #prettydiff #a11y h4 {
+                margin: 0.25em 0
+            }
+
+            #prettydiff #a11y ol {
+                border-style: solid;
+                border-width: 0.1em
+            }
+
+            /*report - csspretty's report*/
+            #prettydiff #cssreport.doc table {
+                clear: none;
+                float: left;
+                margin-left: 1em
+            }
+
+            #prettydiff #css-size {
+                left: 24em
+            }
+
+            #prettydiff #css-uri {
+                left: 40em
+            }
+
+            #prettydiff #css-uri td {
+                text-align: left
+            }
+
+            #prettydiff .report .analysis th {
+                text-align: left
+            }
+
+            #prettydiff table.code td,
+            #prettydiff table.code th {
+                font-size: 0.9em
+            }
+
+            #prettydiff table.code td,
+            #prettydiff table.code th,
+            #prettydiff .report .analysis .parseData td {
+                font-family: 'Courier New', Courier, 'Lucida Console', monospace;
+                text-align: left;
+                white-space: pre
+            }
+
+            #prettydiff .report .analysis td {
+                text-align: right
+            }
+
+            #prettydiff .analysis {
+                float: left;
+                margin: 0 1em 1em 0
+            }
+
+            #prettydiff .analysis td,
+            #prettydiff .analysis th {
+                padding: 0.5em
+            }
+
+            /*report - diffcli rendered into HTML*/
+            #prettydiff .diffcli {
+                font-size: Courier, 'Courier New', 'Lucida Console', monospace;
+                margin: 0;
+                padding: 0;
+                text-align: left;
+                white-space: pre;
+            }
+
+            #prettydiff .diffcli li {
+                border-bottom-style: solid;
+                border-bottom-width: 0.1em;
+                list-style: none;
+                padding-bottom: 1em
+            }
+
+            #prettydiff #webtool .diffcli h3 {
+                font-size: 1.4em;
+                font-weight: normal;
+                margin-top: 2em
+            }
+
+            #prettydiff #webtool .diffcli p,
+            #prettydiff .diffcli del,
+            #prettydiff .diffcli ins {
+                display: block;
+                font-family: Courier, 'Courier New', 'Lucida Console', monospace;
+                font-size: 1.2em;
+                font-style: normal;
+                margin: 0;
+                text-decoration: none
+            }
+
+            #prettydiff .diffcli em {
+                color: inherit;
+                font-style: normal;
+                font-weight: bold
+            }
+
+            #prettydiff .diffcli del em,
+            #prettydiff .diffcli ins em {
+                text-decoration: underline
+            }
+
+            /*report - stat report*/
+            #prettydiff #statreport div {
+                border-style: none
+            }
+
+            /*report - generated HTML artifacts*/
+            #prettydiff .diff,
+            #prettydiff .beautify {
+                border-style: solid;
+                border-width: 0.1em;
+                display: inline-block;
+                margin: 0 1em 1em 0;
+                position: relative
+            }
+
+            #prettydiff .diff,
+            #prettydiff .diff li
+            #prettydiff .diff h3,
+            #prettydiff .diff h4,
+            #prettydiff .beautify,
+            #prettydiff .beautify li,
+            #prettydiff .beautify h3,
+            #prettydiff .beautify h4 {
+                font-family: 'Courier New', Courier, 'Lucida Console', monospace
+            }
+
+            #prettydiff .diff li,
+            #prettydiff .beautify li,
+            #prettydiff .diff h3,
+            #prettydiff .diff h4,
+            #prettydiff .beautify h3,
+            #prettydiff .beautify h4 {
+                border-style: none none solid none;
+                border-width: 0 0 0.1em 0;
+                box-shadow: none;
+                display: block;
+                font-size: 1.2em;
+                margin: 0 0 0 -.1em;
+                padding: 0.2em 2em;
+                text-align: left
+            }
+
+            #prettydiff .diff .skip {
+                border-style: none none solid;
+                border-width: 0 0 0.1em
+            }
+
+            #prettydiff .diff .diff-left {
+                border-style: none;
+                display: table-cell
+            }
+
+            #prettydiff .diff .diff-right {
+                border-style: none none none solid;
+                border-width: 0 0 0 0.1em;
+                display: table-cell;
+                margin-left: -.1em;
+                min-width: 16.5em;
+                right: 0;
+                top: 0
+            }
+
+            #prettydiff .diff-right .data {
+                width: 100%
+            }
+
+            #prettydiff .diff .data li,
+            #prettydiff .beautify .data li {
+                min-width: 16.5em;
+                padding: 0.5em
+            }
+
+            #prettydiff .diff li,
+            #prettydiff .diff p,
+            #prettydiff .diff h3,
+            #prettydiff .beautify li,
+            #prettydiff .beautify p,
+            #prettydiff .beautify h3 {
+                font-size: 1.2em
+            }
+
+            #prettydiff .diff li em,
+            #prettydiff .beautify li em {
+                font-style: normal;
+                font-weight: bold;
+                margin: -0.5em -0.09em
+            }
+
+            #prettydiff .diff p.author {
+                border-style: solid;
+                border-width: 0.2em 0.1em 0.1em;
+                margin: 0;
+                overflow: hidden;
+                padding: 0.4em;
+                text-align: right
+            }
+
+            #prettydiff .difflabel {
+                display: block;
+                height: 0
+            }
+
+            #prettydiff .count {
+                border-style: solid;
+                border-width: 0 0.1em 0 0;
+                font-weight: normal;
+                padding: 0;
+                text-align: right
+            }
+
+            #prettydiff .count li {
+                padding: 0.5em 1em;
+                text-align: right
+            }
+
+            #prettydiff .count li.fold {
+                cursor: pointer;
+                font-weight: bold;
+                padding-left: 0.5em
+            }
+
+            #prettydiff .data {
+                text-align: left;
+                white-space: pre
+            }
+
+            #prettydiff .beautify .data em {
+                display: inline-block;
+                font-style: normal;
+                font-weight: bold
+            }
+
+            #prettydiff .beautify li,
+            #prettydiff .diff li {
+                border-style: none none solid;
+                border-width: 0 0 0.1em;
+                display: block;
+                height: 1em;
+                line-height: 1.2;
+                list-style-type: none;
+                margin: 0;
+                white-space: pre
+            }
+
+            #prettydiff .beautify ol,
+            #prettydiff .diff ol {
+                display: table-cell;
+                margin: 0;
+                padding: 0
+            }
+
+            #prettydiff .beautify em.l0,
+            #prettydiff .beautify em.l1,
+            #prettydiff .beautify em.l2,
+            #prettydiff .beautify em.l3,
+            #prettydiff .beautify em.l4,
+            #prettydiff .beautify em.l5,
+            #prettydiff .beautify em.l6,
+            #prettydiff .beautify em.l7,
+            #prettydiff .beautify em.l8,
+            #prettydiff .beautify em.l9,
+            #prettydiff .beautify em.l10,
+            #prettydiff .beautify em.l11,
+            #prettydiff .beautify em.l12,
+            #prettydiff .beautify em.l13,
+            #prettydiff .beautify em.l14,
+            #prettydiff .beautify em.l15,
+            #prettydiff .beautify em.l16 {
+                height: 2.2em;
+                margin: 0 0 -1em;
+                position: relative;
+                top: -0.5em
+            }
+
+            #prettydiff .beautify em.l0 {
+                margin-left: -0.5em;
+                padding-left: 0.5em
+            }
+
+            #prettydiff #webtool table table {
+                margin: 0 -0.1em -0.1em;
+                width: 100%
+            }
+
+            #prettydiff #webtool table table td,
+            #prettydiff #webtool table table th {
+                font-size: 1em
+            }
+
+            #prettydiff #webtool table td.nested {
+                padding: 0.5em
+            }
+
+            /*webtool - overrides*/
+            #prettydiff #report .beautify,
+            #prettydiff #report .beautify li,
+            #prettydiff #report .diff,
+            #prettydiff #report .diff li {
+                font-family: "Courier New", Courier, "Lucida Console", monospace
+            }
+
+            #prettydiff #report .beautify {
+                border-style: solid
+            }
+
+            #prettydiff #report .diff h3,
+            #prettydiff #report .beautify h3 {
+                border-top-style: solid;
+                border-top-width: 0.1em;
+                margin: 0
+            }
+
+            #prettydiff #webtool #a11y,
+            #prettydiff #webtool #a11y div,
+            #prettydiff #webtool #a11y ol,
+            #prettydiff #webtool #a11y ul {
+                border-style: none
+            }
+
+
+        </style>
+    <body>
+    <div id="prettydiff">
+        <div id="report" class="contentarea">
+
+            <ol xmlns="http://www.w3.org/1999/xhtml" class="diffcli">
+                <li><h3>Line: 3</h3>
+                    <del> "bluepaper.description": "<em>Our Whitepaper for Unders</em>tand<em>ing</em> the <em>Vision</em>
+                        and <em>Technologies</em> behind Menlo One<em></em>",
+                    </del>
+                    <ins> "bluepaper.description": "<em>Unders</em>tand<em></em> the <em>vision</em> and
+                        <em>technologies</em> behind Menlo One<em>.</em>",
+                    </ins>
+                </li>
+                <li><h3>Line: 14</h3>
+                    <ins> "hero": "The Framework for Scaling the Token Economy",</ins>
+                </li>
+                <li><h3>Line: 40</h3>
+                    <del> "ico.description": "Making the next generation token sale experience and<em> unlocking</em> the
+                        never before possible with the Menlo One framework",
+                    </del>
+                    <ins> "ico.description": "Making the next generation token sale experience and<em>\nunlocking</em> the
+                        never before possible with the Menlo One framework",
+                    </ins>
+                </li>
+                <li><h3>Line: 44</h3>
+                    <del> "jobs.header": "Curious and passionate about blockchain technology?<em></em>",</del>
+                    <ins> "jobs.header": "Curious and passionate about blockchain technology?<em> </em>",</ins>
+                </li>
+                <li><h3>Line: 53</h3>
+                    <del> "mission.description": "<em></em>Menlo One is <em>founded by Matt Nolan, a season technologist who
+                        has been buil</em>di<em>ng appli</em>ca<em>tions for IBM, JP Morg</em>an<em>, and High5 Games
+                        for</em> th<em>e p</em>a<em>s</em>t <em>10 y</em>ea<em>rs. As an entrepreneur, Matt has put</em>
+                        to<em>gether</em> a <em>d</em>e<em>dica</em>t<em>ed team at Men</em>lo<em> O</em>ne<em></em> th<em>ats</em>
+                        <em>car</em>e<em>s deep</em>l<em>y abou</em>t<em> cr</em>e<em>ating great software to build the
+                            foundation for the next generation of decentralized applications</em>.",
+                    </del>
+                    <ins> "mission.description": "<em>The mission of </em>Menlo One is <em></em>to di<em>sintermediate the
+                        exchange of value. We're starting by building secure but simple-to-use blockchain technologies that
+                        expand the ability to disintermediate while creating prosperity. Small, dedicated
+                        teams </em>ca<em>n </em>an<em>d have always pioneered the Cambrian Explosion of innovation</em>
+                        th<em></em>a<em></em>t <em>l</em>ea<em>ds</em> to<em></em> a <em>b</em>e<em></em>t<em>ter world. We
+                            believe that transformative innovation will no </em>lo<em>nger </em>ne<em>ed connections to</em>
+                        th<em>e</em> <em></em>e<em></em>l<em>i</em>t<em></em>e<em></em>.",
+                    </ins>
+                    <del> "mission.header": "Our <em>F</em>o<em>u</em>n<em>der</em>",</del>
+                    <ins> "mission.header": "Our <em>missi</em>o<em></em>n<em></em>",</ins>
+                    <ins> "nav.blog": "Blog",</ins>
+                    <ins> "nav.contact": "Contact Us",</ins>
+                    <ins> "nav.jobs": "Jobs",</ins>
+                    <ins> "nav.overview": "Overview",</ins>
+                    <ins> "nav.privacy": "Privacy",</ins>
+                    <ins> "nav.signup": "Sign Up",</ins>
+                    <ins> "nav.team": "Team",</ins>
+                </li>
+                <li><h3>Line: 76</h3>
+                    <del> "roadmap.1.description": "Launch of Ether-Signal, a precursor to TownHall<em>,</em> developed for
+                        members of the Ethereum Foundation<em>,</em> to help the community vote on whether or not to fork
+                        after the DAO hack: <em>&lt;a href='</em>https://github.com/MenloOne/ethersignal<em>'
+                            target='_blank' rel='noopener noreferrer'&gt;https://github.com/MenloOne/ethersignal&lt;/a&gt;&lt;br
+                            /&gt;&lt;br /&gt;Early</em> development of Vulcanize DB, a project started by <em></em>Menlo One
+                        team members<em>,</em> and is key to Menlo Core: <em>&lt;a href='</em>https://github.com/vulcanize/VulcanizeDB<em>'
+                            target='_blank' rel='noopener
+                            noreferrer'&gt;https://github.com/vulcanize/VulcanizeDB&lt;/a&gt;</em>",
+                    </del>
+                    <ins> "roadmap.1.description": "Launch of Ether-Signal, a precursor to TownHall<em>. Was</em> developed
+                        for members of the Ethereum Foundation<em></em> to help the community vote on whether or not to fork
+                        after the DAO hack: <em></em>https://github.com/MenloOne/ethersignal<em>\n\nEarly</em> development
+                        of Vulcanize DB, a project started by <em>the </em>Menlo One team members<em></em> and is key to
+                        Menlo Core: <em></em>https://github.com/vulcanize/VulcanizeDB<em></em>",
+                    </ins>
+                    <del> "roadmap.1.title": "Summer 2016:<em></em>",</del>
+                    <ins> "roadmap.1.title": "Summer 2016:<em> </em>",</ins>
+                </li>
+                <li><h3>Line: 79</h3>
+                    <del> "roadmap.2.title": "Q4 2017:<em></em>",</del>
+                    <ins> "roadmap.2.title": "Q4 2017:<em> </em>",</ins>
+                    <del> "roadmap.3.description": "TownHall Beta Released<em></em>",</del>
+                    <ins> "roadmap.3.description": "TownHall Beta Released<em> </em>",</ins>
+                    <del> "roadmap.3.title": "Q1 2018:<em></em>",</del>
+                    <ins> "roadmap.3.title": "Q1 2018:<em> </em>",</ins>
+                </li>
+                <li><h3>Line: 83</h3>
+                    <del> "roadmap.4.title": "H2 2018:<em></em>",</del>
+                    <ins> "roadmap.4.title": "H2 2018:<em> </em>",</ins>
+                </li>
+                <li><h3>Line: 88</h3>
+                    <del> "tech.description": "Menlo One <em>gives developers the essential building</em> block<em>s f</em>or
+                        <em>decentralized apps. From a d</em>is<em>tributed database,</em> to <em>a</em> pro<em>of of
+                            reputation system, to transactions and governance, our</em> framework <em>gives you
+                            the </em>to<em>ols you need without having to</em> build <em></em>the<em>m from scratch. We
+                            re-imagined the web stack for a future with no administrators,</em> cen<em>sors, or s</em>in<em>gle</em>
+                        <em>poin</em>t<em></em> of <em></em>f<em></em>a<em>ilur</em>e<em>."</em>,<em></em></del>
+                    <ins> "tech.description": "Menlo One <em>is to</em> block<em>chain what Rails is to Ruby </em>or <em>what
+                        Wordpress </em>is<em></em> to <em>LAMP. By integrating several key technologies and</em> pro<em>tocols,
+                        Menlo One provides developers with a</em> framework <em></em>to<em></em> build <em>decentralized
+                        apps which compete with </em>the<em>ir</em> cen<em>tralized predecessors </em>in<em></em> <em></em>t<em>erms</em>
+                        of <em>per</em>f<em>orm</em>a<em>nc</em>e<em></em>,<em> cost to user, and ease of use. We
+                            re-imagined the web stack for an future with no administrators, censors, or single point of
+                            failure.",</em></ins>
+                    <del> "tech.<em>s</em>t<em>ack.1.desc</em>r<em>ipti</em>o<em>n</em>": "<em>A </em>d<em>esktop </em>n<em>ative
+                        app that runs li</em>g<em>ht nodes of Ethereum</em>,<em> IPFS, and other networks. dApps built with
+                        Menlo One have a smooth user experience thanks to it’s automated transaction API.",</em></del>
+                    <ins> "tech.<em>in</em>t<em></em>r<em></em>o<em></em>":
+                        "<em>Intro</em>d<em>uci</em>n<em></em>g<em>"</em>,<em></em></ins>
+                    <ins> "tech.layer.1": "TownHall",</ins>
+                    <ins> "tech.layer.1.desc": "Communication layer",</ins>
+                    <ins> "tech.layer.2": "Guild",</ins>
+                    <ins> "tech.layer.2.desc": "Governance layer",</ins>
+                    <ins> "tech.layer.3": "Pocketbook",</ins>
+                    <ins> "tech.layer.3.desc": "Transaction layer",</ins>
+                    <ins> "tech.layer.4": "MenloCore",</ins>
+                </li>
+                <li><h3>Line: 91</h3>
+                    <del> "tech.stack.2.description": "With no admins, the Web3 needs to know who to trust. Our
+                        Proof-of-Reputation algorithm leverages Token<em> Curated-</em>Registry design patterns<em>,</em> to
+                        incentivize virtuous behavior within the ecosystem, so <em>that </em>only those providing value to
+                        others are compensated in tokens.",
+                    </del>
+                    <ins> "tech.stack.2.description": "With no admins, the Web3 needs to know who to trust. Our
+                        Proof-of-Reputation algorithm leverages Token<em>-Curated </em>Registry design patterns<em></em> to
+                        incentivize virtuous behavior within the ecosystem, so <em></em>only those providing value to others
+                        are compensated in tokens.",
+                    </ins>
+                    <del> "tech.stack.2.header": "Proof-of-Reputation<em></em>",</del>
+                    <ins> "tech.stack.2.header": "Proof-of-Reputation<em> </em>",</ins>
+                    <del> "tech.stack.3.description": "At the core<em> it is</em> a decentralized database<em>,</em> which
+                        caches data from multiple blockchains<em>,</em> to provide users <em>wi</em>th<em> the</em> speed
+                        and experience of a traditional webapp, without compromising the security guarantees of a
+                        distributed blockchain.",
+                    </del>
+                    <ins> "tech.stack.3.description": "At the core<em>, is</em> a decentralized database<em></em> which
+                        caches data from multiple blockchains<em></em> to provide users <em></em>th<em>e</em> speed and
+                        experience of a traditional webapp, without compromising the security guarantees of a distributed
+                        blockchain.",
+                    </ins>
+                    <del> "tech.stack.3.header": "Decentralized Database<em></em>",</del>
+                    <ins> "tech.stack.3.header": "Decentralized Database<em> </em>",</ins>
+                    <ins> "tech.stack.header": "Three Key Technologies",</ins>
+                </li>
+                <li><h3>Line: 100</h3>
+                    <del> "token.description": "Menlo Token (MET) is an open source ERC20 compatible token on the Ethereum
+                        public blockchain. MET is a critical piece of software designed to work flawlessly with our software
+                        and is sold so developers have a fully functional product with which to build on.<em></em>",
+                    </del>
+                    <ins> "token.description": "Menlo Token (MET) is an open source ERC20 compatible token on the Ethereum
+                        public blockchain. MET is a critical piece of software designed to work flawlessly with our software
+                        and is sold so developers have a fully functional product with which to build on.<em> </em>",
+                    </ins>
+                </li>
+                <li><h3>Line: 103</h3>
+                    <del> "token.fact.3": "Used to pay users for &lt;br&gt;<em> </em>comments and reviews",</del>
+                    <ins> "token.fact.3": "Used to pay users for &lt;br&gt;<em>\n</em>comments and reviews",</ins>
+                </li>
+                <li><h3>Line: 107</h3>
+                    <del> "token.sale.3": "<em></em> <em></em>",</del>
+                    <ins> "token.sale.3": "<em>KYC</em> <em>Open Now</em>",</ins>
+                </li>
+                <li><h3>Line: 109</h3>
+                    <del> "token.sale.description": "<em>At</em> <em>M</em>e<em>n</em>l<em>o</em> <em>On</em>e<em></em> <em>w</em>e<em>'re</em>
+                        <em>w</em>o<em>rki</em>n<em>g</em> <em>thro</em>u<em>gh</em> <em>our</em> <em>private presale
+                            allocations. We expect to announce a date for our public token sale by the end of Q3 this year.
+                            For more information and to stay up to date</em>,<em> get whitelisted now.",</em></del>
+                    <ins> "token.sale.description": "<em>Public</em> <em>Pr</em>e<em>sa</em>l<em>e</em>
+                        <em>Go</em>e<em>s</em> <em>Liv</em>e<em></em> <em></em>o<em></em>n<em></em> <em>J</em>u<em>ly</em>
+                        <em>16,</em> <em>2018"</em>,<em></em></ins>
+                </li>
+                <li><h3>Line: 111</h3>
+                    <del> "uses.1": "Music Apps that<em>&lt;br /&gt;</em>Pay You for<em>&lt;br /&gt;</em>Producing",</del>
+                    <ins> "uses.1": "Music Apps that<em> </em>Pay You for<em> </em>Producing",</ins>
+                    <del> "uses.2": "Ecological<em>&lt;br /&gt;</em>Resource<em>&lt;br /&gt;</em>Development",</del>
+                    <ins> "uses.2": "Ecological<em> </em>Resource<em> </em>Development",</ins>
+                </li>
+                <li><h3>Line: 117</h3>
+                    <del> "uses.title": "Apps that can<em>&amp;apos;t</em> be stopped.",</del>
+                    <ins> "uses.title": "Apps that can<em>'t</em> be stopped.",</ins>
+                </li>
+                <li><h3>Line: 119</h3>
+                    <del> "why.fact.2": "Blockchain, with <em>cloud</em> performance.",</del>
+                    <ins> "why.fact.2": "Blockchain, with <em>\ncloud</em> performance.",</ins>
+                </li>
+                <li><h3>Line: 121</h3>
+                    <del> "why.fact.4": "Users own their<em> own</em> data.",</del>
+                    <ins> "why.fact.4": "Users own their<em>\nown</em> data.",</ins>
+                    <del> "why.fact.5": "Decentralized. Can<em>'t</em> be stopped<em> or</em> censored.",</del>
+                    <ins> "why.fact.5": "Decentralized. Can<em>’t</em> be stopped<em>\nor</em> censored.",</ins>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    </body>
+    </head>
+</htmls>
