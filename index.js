@@ -106,7 +106,7 @@ async.series([
             let fileContents = 'export default {\n  "messages": ';
 
             // stringify JSON contents
-            let translationsJson = JSON.stringify(translations[locale], null, 2);
+            let translationsJson = JSON.stringify(translations[locale], Object.keys(translations[locale]).sort(), 2);
 
             // Apply proper to each translation line
             translationsJson = translationsJson.replaceAll("  ", "    ");
