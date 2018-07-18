@@ -1,7 +1,6 @@
 # Do ignore
 input/*
 output/*
-.idea/
 
 # Don't ignore
 !input/.gitkeep

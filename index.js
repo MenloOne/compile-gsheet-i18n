@@ -3,8 +3,14 @@ var async = require('async');
 var process = require('process')
 var fs = require('fs')
 
+if (process.argv.length < 3) {
+    console.log('Usage:  ' + process.argv[1].split('/').pop() + " <SheetID>\n")
+    process.exit();
+}
+
 // spreadsheet key is the long id in the sheets URL
-var doc = new GoogleSpreadsheet('1siY5752qy_rbwkCKz7XVPGZFi8AGwaMJGEkhFGxn5Ow');
+var doc = new GoogleSpreadsheet(process.argv[2]);
+
 var sheet;
 var sheetRows;
 
