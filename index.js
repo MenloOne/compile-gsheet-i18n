@@ -1,104 +1,93 @@
-var fs = require('fs');
-var LineReader = require('readline')
+var GoogleSpreadsheet = require('google-spreadsheet');
+var async = require('async');
+var process = require('process')
+var fs = require('fs')
 
-const dirName = 'input';
+// spreadsheet key is the long id in the sheets URL
+var doc = new GoogleSpreadsheet('1XX4ioIjbwr9UUptq4-XToO8UKg1B1hPhStawiFaJ4Nw');
+var sheet;
 
-const delimiter = '\t';
+Array.prototype.removeItems = function(array2) {
+    var array1 = this;
+    return array1.filter(value => -1 === array2.indexOf(value));
+}
 
 String.prototype.replaceAll = function (search, replacement) {
     var target = this;
     return target.split(search).join(replacement);
 };
 
-// Get a list of all of the files.
-fs.readdir(dirName, function (err, items) {
-    console.log('File List:', items);
+let locales = [];
+let translations = {};
 
-    // Loop through all files.
-    for (var i = 0; i < items.length; i++) {
-
-        let currentLine = 0;
-        const fileName = items[i];
-
-        var file = dirName + '/' + fileName;
-
-        // Collect stats on each file
-        const lineReader = LineReader.createInterface({
-            input: fs.createReadStream(file)
-        });
-
-        let locales = [];
-        let translations = {};
-
-        lineReader.on('line', function (line) {
-
-            // Get list of translation keys from the first row
-            if (currentLine === 0) {
-                // First, remove the "key" column from the translation list
-                locales = line.split(delimiter);
-                const keyColumn = locales.indexOf('key')
-                locales.splice(keyColumn, 1);
-
-                // Populate the translations object with empty objects for each locale.
-                for (let i = 0; i < locales.length; i++) {
-                    const locale = locales[i];
-                    translations[locale] = {};
-                }
-            } else {
-                // Process all other rows and add their contects to the proper translation object.
-                line = line.split(delimiter);
-                const key = line[0];
-                
-                for (let j = 0; j < line.length; j++) {
-                    if(j !== 0) {
-                        const item = line[j];
-                        const itemIndex = j;
-                        translations[locales[j - 1]][key] = item;
-                    }
-                }
+async.series([
+    function getInfoAndWorksheets(step) {
+        doc.getInfo(function(err, info) {
+            if (err) {
+                console.log(err);
+                process.exit();
             }
-            
-            // Add the translations to the proper translation object.
-
-
-            currentLine++;
-        });
-
-        lineReader.on('close', () => {
-            // Create Output Folder for each input file.
-            const filenameParts = fileName.split('.')
-            filenameParts.pop() // This automatically ignores files that start with ".", WOOHOO :)
-            const fileOutputDir = 'output/' + filenameParts.join('.');
-            
-            if (!fs.existsSync(fileOutputDir)) {
-                fs.mkdirSync(fileOutputDir);
-            }
-            // Create localization files in each input file's output folder
-            for (let k = 0; k < locales.length; k++) {
-                const locale = locales[k];
-                const localeFilePath = fileOutputDir + '/' + locale + '.js';
-                
-                // contents should first begin export default
-                let fileContents = 'export default {\n\tmessages: ';
-
-                // stringify JSON contents
-                let translationsJson = JSON.stringify(translations[locale], null, 2);
-
-                // Apply proper to each translation line
-                translationsJson = translationsJson.replaceAll("  ", "    ") 
-
-                // Apply proper padding to closing line
-                translationsJson = translationsJson.replace('}', "  }")
-                
-                // Add formatted file contents to file contents
-                fileContents += translationsJson;
-
-                // end export default
-                fileContents += "\n}"
-
-                // Write the contents to the file
-                fs.writeFileSync(localeFilePath, fileContents)
-            }
+            console.log('Loaded doc: '+info.title+' by '+info.author.email);
+            sheet = info.worksheets[0];
+            console.log('sheet 1: '+sheet.title+' '+sheet.rowCount+'x'+sheet.colCount);
+            step();
         })
+    },
+    function getRows(step) {
+        // google provides some query options
+        sheet.getRows({
+            offset: 1,
+            limit: 100
+        }, function( err, rows ){
+            console.log('Read '+rows.length+' rows');
+
+            locales = Object.keys(rows[0]).removeItems(['id','key', 'save', 'del', '_links', '_xml']);
+            locales.forEach(locale => translations[locale] = {});
+
+            rows.forEach(row => {
+                locales.forEach(locale => translations[locale][row.key] = row[locale]);
+            });
+
+            step();
+        });
+    },
+    function outputFiles(step) {
+
+        const fileOutputDir = 'app/data/'
+
+        // Create localization files in each input file's output folder
+        for (let k = 0; k < locales.length; k++) {
+            const locale = locales[k];
+            const localeFilePath = fileOutputDir + locale + '.js';
+
+            console.log('Writing ' + localeFilePath);
+
+            // contents should first begin export default
+            let fileContents = 'export default {\n  messages: ';
+
+            // stringify JSON contents
+            let translationsJson = JSON.stringify(translations[locale], null, 2);
+
+            // Apply proper to each translation line
+            translationsJson = translationsJson.replaceAll("  ", "    ")
+
+            // Apply proper padding to closing line
+            translationsJson = translationsJson.replace('}', "  }")
+
+            // Add formatted file contents to file contents
+            fileContents += translationsJson;
+
+            // end export default
+            fileContents += "\n}\n"
+
+            // Write the contents to the file
+            fs.writeFileSync(localeFilePath, fileContents)
+        }
+
+            step();
+    }
+], function(err){
+    if( err ) {
+        console.log(err);
     }
 });

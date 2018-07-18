@@ -1,7 +1,10 @@
 # Do ignore
 input/*
 output/*
+.idea/
 
 # Don't ignore
 !input/.gitkeep
 !output/.gitkeep
+/node_modules
+/app
