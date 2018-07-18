@@ -4,7 +4,7 @@ var process = require('process')
 var fs = require('fs')
 
 // spreadsheet key is the long id in the sheets URL
-var doc = new GoogleSpreadsheet('1XX4ioIjbwr9UUptq4-XToO8UKg1B1hPhStawiFaJ4Nw');
+var doc = new GoogleSpreadsheet('1siY5752qy_rbwkCKz7XVPGZFi8AGwaMJGEkhFGxn5Ow');
 var sheet;
 var sheetRows;
 
