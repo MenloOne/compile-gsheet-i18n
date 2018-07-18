@@ -78,10 +78,16 @@ async.series([
             locales.forEach(locale => {
                 if (row[locale].length === 0) {
                     // Keep existing translation
+
+                    if (translations[locale][row.key].length == 0) {
+                        // If no existing translation use English
+                        translations[locale][row.key] = row['en'];
+                    }
+
                     return;
                 }
 
-                translations[locale][row.key] = row[locale]
+                translations[locale][row.key] = row[locale];
             });
         });
 
@@ -103,16 +109,16 @@ async.series([
             let translationsJson = JSON.stringify(translations[locale], null, 2);
 
             // Apply proper to each translation line
-            translationsJson = translationsJson.replaceAll("  ", "    ")
+            translationsJson = translationsJson.replaceAll("  ", "    ");
 
             // Apply proper padding to closing line
-            translationsJson = translationsJson.replace('}', "  }")
+            translationsJson = translationsJson.replace('}', "  }");
 
             // Add formatted file contents to file contents
             fileContents += translationsJson;
 
             // end export default
-            fileContents += "\n}\n"
+            fileContents += "\n}\n";
 
             // Write the contents to the file
             fs.writeFileSync(localeFilePath, fileContents)
