@@ -79,7 +79,7 @@ async.series([
                 if (row[locale].length === 0) {
                     // Keep existing translation
 
-                    if (translations[locale][row.key].length == 0) {
+                    if (!translations[locale][row.key] || translations[locale][row.key].length == 0) {
                         // If no existing translation use English
                         translations[locale][row.key] = row['en'];
                     }
