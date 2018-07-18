@@ -6,6 +6,7 @@ var fs = require('fs')
 // spreadsheet key is the long id in the sheets URL
 var doc = new GoogleSpreadsheet('1XX4ioIjbwr9UUptq4-XToO8UKg1B1hPhStawiFaJ4Nw');
 var sheet;
+var sheetRows;
 
 Array.prototype.removeItems = function(array2) {
     var array1 = this;
@@ -19,6 +20,8 @@ String.prototype.replaceAll = function (search, replacement) {
 
 let locales = [];
 let translations = {};
+let appFolder = 'app/data/';
+
 
 async.series([
     function getInfoAndWorksheets(step) {
@@ -41,29 +44,54 @@ async.series([
         }, function( err, rows ){
             console.log('Read '+rows.length+' rows');
 
-            locales = Object.keys(rows[0]).removeItems(['id','key', 'save', 'del', '_links', '_xml']);
-            locales.forEach(locale => translations[locale] = {});
-
-            rows.forEach(row => {
-                locales.forEach(locale => translations[locale][row.key] = row[locale]);
-            });
-
+            sheetRows = rows
             step();
         });
     },
-    function outputFiles(step) {
+    function surmiseLocales(step) {
+        locales = Object.keys(sheetRows[0]).removeItems(['id', 'key', 'save', 'del', '_links', '_xml']);
+        locales.forEach(locale => translations[locale] = {});
 
-        const fileOutputDir = 'app/data/'
+        step();
+    },
+    function loadExistingFiles(step) {
+
+        locales.forEach(locale => {
+            const localeFilePath = appFolder + locale + '.js';
+
+            console.log('Reading ' + localeFilePath);
+            var script = fs.readFileSync(localeFilePath, "utf8");
+            script = script.replaceAll('export default', '')
+            translations[locale] = JSON.parse(script).messages;
+        });
+
+        step();
+    },
+    function parseRows(step) {
+        sheetRows.forEach(row => {
+            locales.forEach(locale => {
+                if (row[locale].length === 0) {
+                    // Keep existing translation
+                    return;
+                }
+
+                translations[locale][row.key] = row[locale]
+            });
+        });
+
+        step();
+    },
+    function outputFiles(step) {
 
         // Create localization files in each input file's output folder
         for (let k = 0; k < locales.length; k++) {
             const locale = locales[k];
-            const localeFilePath = fileOutputDir + locale + '.js';
+            const localeFilePath = appFolder + locale + '.js';
 
             console.log('Writing ' + localeFilePath);
 
             // contents should first begin export default
-            let fileContents = 'export default {\n  messages: ';
+            let fileContents = 'export default {\n  "messages": ';
 
             // stringify JSON contents
             let translationsJson = JSON.stringify(translations[locale], null, 2);
