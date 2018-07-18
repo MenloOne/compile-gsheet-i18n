@@ -1,0 +1,7 @@
+# Do ignore
+input/*
+output/*
+
+# Don't ignore
+!input/.gitkeep
+!output/.gitkeep
