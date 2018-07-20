@@ -45,8 +45,7 @@ async.series([
     function getRows(step) {
         // google provides some query options
         sheet.getRows({
-            offset: 1,
-            limit: 100
+            offset: 1
         }, function( err, rows ){
             console.log('Read '+rows.length+' rows');
 
