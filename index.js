@@ -3,13 +3,38 @@ var async = require('async');
 var process = require('process')
 var fs = require('fs')
 
-if (process.argv.length < 3) {
-    console.log('Usage:  ' + process.argv[1].split('/').pop() + " <SheetID>\n")
+function showUsage() {
+    console.log(
+        'Usage:  ' + process.argv[1].split('/').pop() + " <Config file>\n" +
+        '\n' +
+        'Config file should be a JSON file w/ all values filled in.  Here are the defaults:\n' +
+        '\n' +
+        '{\n' +
+        '  "sheetID": null,\n' +
+        '  "folder": "lang/",\n' +
+        '  "header": "export default ",\n' +
+        '  "hashName": "messages"\n' +
+        '}\n'
+    )
     process.exit();
 }
 
+if (process.argv.length < 3) {
+    showUsage();
+}
+
+const configFilePath = process.argv[2];
+
+console.log('Config: ' + configFilePath);
+const config = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
+
+if (!config.sheetID) {
+    showUsage();
+}
+
+
 // spreadsheet key is the long id in the sheets URL
-var doc = new GoogleSpreadsheet(process.argv[2]);
+var doc = new GoogleSpreadsheet(config.sheetID);
 
 var sheet;
 var sheetRows;
@@ -26,7 +51,7 @@ String.prototype.replaceAll = function (search, replacement) {
 
 let locales = [];
 let translations = {};
-let appFolder = 'app/data/';
+let appFolder = config.folder;
 
 
 async.series([
@@ -66,8 +91,8 @@ async.series([
 
             console.log('Reading ' + localeFilePath);
             var script = fs.readFileSync(localeFilePath, "utf8");
-            script = script.replaceAll('export default', '')
-            translations[locale] = JSON.parse(script).messages;
+            script = script.replaceAll(config.header, '')
+            translations[locale] = JSON.parse(script)[config.hashName];
         });
 
         step();
@@ -102,7 +127,7 @@ async.series([
             console.log('Writing ' + localeFilePath);
 
             // contents should first begin export default
-            let fileContents = 'export default {\n  "messages": ';
+            let fileContents = config.header + '{\n  "' + config.hashName + '": ';
 
             // stringify JSON contents
             let translationsJson = JSON.stringify(translations[locale], Object.keys(translations[locale]).sort(), 2);
